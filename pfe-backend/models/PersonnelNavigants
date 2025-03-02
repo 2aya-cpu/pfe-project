@@ -1,0 +1,40 @@
+const PersonnelNavigant = sequelize.define('PersonnelNavigant', {
+  matricule_pn: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  nom: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
+  },
+  specialite: {
+    type: DataTypes.INTEGER,
+  },
+  qualif1: {
+    type: DataTypes.STRING(255),
+  },
+  encadrement: {
+    type: DataTypes.STRING(255),
+  },
+  instructeur: {
+    type: DataTypes.STRING(255),
+  },
+  contrat: {
+    type: DataTypes.INTEGER,
+  },
+  base: {
+    type: DataTypes.INTEGER,
+  },
+  date_sortie: {
+    type: DataTypes.DATE,
+  },
+}, {
+  tableName: 'personnel_navigants',
+  timestamps: false,
+});
+
+// Relations
+PersonnelNavigant.belongsTo(Contrat, { foreignKey: 'contrat' });
+PersonnelNavigant.belongsTo(Base, { foreignKey: 'base' });
+PersonnelNavigant.belongsTo(Grade, { foreignKey: 'code_grade' });
