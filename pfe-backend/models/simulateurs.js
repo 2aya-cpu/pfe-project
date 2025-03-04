@@ -1,14 +1,10 @@
-const Simulateur = sequelize.define('Simulateur', {
-  code_simulateur: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  lib_simulateur: {
-    type: DataTypes.STRING(255),
-    allowNull: false,
-  },
-}, {
-  tableName: 'simulateurs',
-  timestamps: false,
-});
+const db = require("../db");
+
+class Simulateur {
+  static async getAllSimulateurs() {
+    const [rows] = await db.query("SELECT * FROM simulateurs");
+    return rows;
+  }
+}
+
+module.exports = Simulateur;

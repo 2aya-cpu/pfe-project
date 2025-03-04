@@ -1,14 +1,10 @@
-const Reseau = sequelize.define('Reseau', {
-    code_reseau: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    lib_reseau: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-  }, {
-    tableName: 'reseaux',
-    timestamps: false,
-  });
+const db = require("../db");
+
+class Reseau {
+  static async getAllReseaux() {
+    const [rows] = await db.query("SELECT * FROM reseaux");
+    return rows;
+  }
+}
+
+module.exports = Reseau;

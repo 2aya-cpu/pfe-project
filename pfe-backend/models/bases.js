@@ -1,14 +1,10 @@
-const Base = sequelize.define('Base', {
-    code_base: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    lib_base: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-  }, {
-    tableName: 'bases',
-    timestamps: false,
-  });
+const db = require("../db");
+
+class Base {
+  static async getAllBases() {
+    const [rows] = await db.query("SELECT * FROM bases");
+    return rows;
+  }
+}
+
+module.exports = Base;

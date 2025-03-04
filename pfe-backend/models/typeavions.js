@@ -1,14 +1,10 @@
-const TypeAvion = sequelize.define('TypeAvion', {
-    code_typeavion: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    lib_typeavion: {
-      type: DataTypes.STRING(255),
-      allowNull: false,
-    },
-  }, {
-    tableName: 'typeavions',
-    timestamps: false,
-  });
+const db = require("../db");
+
+class TypeAvion {
+  static async getAllTypes() {
+    const [rows] = await db.query("SELECT * FROM typeavions");
+    return rows;
+  }
+}
+
+module.exports = TypeAvion;
