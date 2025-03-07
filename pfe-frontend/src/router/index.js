@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from "vue-router";
-import HelloWorld from "../components/HelloWorld.vue";
 import LoginForm from "../components/LoginForm.vue";
+import AdminDashboard from "../components/AdminDashboard.vue";
+import AgentDashboard from "../components/AgentDashboard.vue";
 
 const routes = [
-  { path: "/", component: HelloWorld },
-  { path: "/login", component: LoginForm }
+  { path: "/", component: LoginForm },
+  { path: "/admin-dashboard", component: AdminDashboard },
+  { path: "/agent-dashboard", component: AgentDashboard },
 ];
 
 const router = createRouter({
