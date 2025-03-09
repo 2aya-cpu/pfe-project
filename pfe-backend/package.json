@@ -21,5 +21,11 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.12.0"
-  }
+  },
+  
+    "email": "admin@example.com",
+    "password": "monmotdepasse"
 }
+
+
+

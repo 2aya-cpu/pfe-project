@@ -2,6 +2,8 @@
   <div>
     <h1>Bienvenue Agent de saisie !</h1>
     <p>Page réservée aux agents.</p>
+    <router-link to="/pn-manager">Gérer PN</router-link>
+
     <button @click="logout">Déconnexion</button>
   </div>
 </template>
