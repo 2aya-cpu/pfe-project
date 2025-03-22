@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginForm from "../components/LoginForm.vue";
-import AdminDashboard from "../components/AdminDashboard.vue";
+import AdminDashboard from "../components/UserManagement.vue";
 import AgentDashboard from "../components/AgentDashboard.vue";
 import PnManager from '@/components/PnManager.vue'
 const routes = [

@@ -2,7 +2,8 @@
   <div class="container">
     <!-- Espace pour le logo -->
     <div class="logo-container">
-      <img :src="require('@/assets/airalgerie.jpg')">
+      <img src="@/assets/airalgerie.jpg" alt="Air Algerie" />
+
 
     </div>
 

@@ -2,7 +2,8 @@
   <div class="login-container">
     <!-- Left Side: Image -->
     <div class="image-section">
-      <img :src="require('@/assets/loginpic.jpg')">
+      <img src="@/assets/loginpic.jpg" alt="Login Picture" />
+
 
       <h1>Bienvenue à Bord!</h1>
     </div>

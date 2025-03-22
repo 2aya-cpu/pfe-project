@@ -25,11 +25,14 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // **Importation des routes**
-const authRoutes = require("./routes/authRoutes"); 
-const pnRoutes = require("./routes/pnRoutes"); // Ajout des routes PN
+const authRoutes = require("./routes/authRoutes"); // Routes d'authentification
+const pnRoutes = require("./routes/pnRoutes"); // Routes pour gérer les PN
+const userRoutes = require("./routes/users.routes"); // Corrected path to match the file name
 
-app.use("/api/auth", authRoutes); // Routes d'authentification
-app.use("/api/pn", pnRoutes); // Routes pour gérer les PN
+// Utilisation des routes
+app.use("/api/auth", authRoutes); // Auth routes
+app.use("/api/pn", pnRoutes); // PN routes
+app.use("/api/users", userRoutes); // User management routes
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
