@@ -24,10 +24,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// **Importation des routes**
+// Importation des routes
 const authRoutes = require("./routes/authRoutes"); // Routes d'authentification
 const pnRoutes = require("./routes/pnRoutes"); // Routes pour gérer les PN
-const userRoutes = require("./routes/users.routes"); // Corrected path to match the file name
+const userRoutes = require("./routes/users"); // Corrected path to match the file name
 
 // Utilisation des routes
 app.use("/api/auth", authRoutes); // Auth routes
@@ -40,7 +40,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Une erreur est survenue" });
 });
 
-// **Démarrer le serveur**
+// Démarrer le serveur
 app.listen(PORT, () => {
-  console.log(`Serveur démarré sur http://localhost:${PORT}`);
+  console.log("Serveur démarré sur http://localhost:" + PORT);
 });

@@ -166,7 +166,7 @@ export default {
   },
   methods: {
     fetchPN() {
-      axios.get('http://localhost:5000/api/pn')
+      axios.get('http://localhost:8080/api/pn')
         .then(response => {
           this.pnList = response.data;
           this.filteredPN = this.pnList;
@@ -199,7 +199,7 @@ export default {
     },
     submitPN() {
       if (this.editMode) {
-        axios.put(`http://localhost:5000/api/pn/${this.originalMatricule}`, this.form)
+        axios.put(`http://localhost:8080/api/pn/${this.originalMatricule}`, this.form)
           .then(response => {
             alert(response.data.message);
             this.closeModal();
@@ -209,7 +209,7 @@ export default {
             console.error(error);
           });
       } else {
-        axios.post('http://localhost:5000/api/pn', this.form)
+        axios.post('http://localhost:8080/api/pn', this.form)
           .then(response => {
             alert(response.data.message);
             this.closeModal();
@@ -245,7 +245,7 @@ export default {
     },
     deletePN(matricule) {
       if (confirm("Voulez-vous vraiment supprimer ce PN ?")) {
-        axios.delete(`http://localhost:5000/api/pn/${matricule}`)
+        axios.delete(`http://localhost:8080/api/pn/${matricule}`)
           .then(response => {
             alert(response.data.message);
             this.fetchPN();

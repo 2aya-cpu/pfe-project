@@ -1,20 +1,23 @@
 <template>
   <div id="app">
-    <UserManagement />
+    <!-- Router View dynamically loads the component matching the current route -->
+    <router-view />
   </div>
 </template>
 
 <script>
-import UserManagement from "@/components/UserManagement.vue"; // Correct the path if necessary
-
 export default {
   name: "App",
-  components: {
-    UserManagement,
-  },
 };
 </script>
 
 <style>
-/* Add any global styles here if needed */
+/* Global styles to make the app fill the entire screen */
+html, body, #app {
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Ensures the app always takes the full height of the viewport */
+  width: 100%; /* Ensures the app always takes the full width of the viewport */
+  overflow: hidden; /* Avoid scrolling */
+}
 </style>

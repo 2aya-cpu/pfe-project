@@ -3,8 +3,6 @@
     <!-- Left Side: Image -->
     <div class="image-section">
       <img src="@/assets/loginpic.jpg" alt="Login Picture" />
-
-
       <h1>Bienvenue à Bord!</h1>
     </div>
 
@@ -15,7 +13,7 @@
         <label>Email</label>
         <input type="email" v-model="email" required />
 
-        <label>Password</label>
+        <label>Mot de passe</label>
         <input type="password" v-model="password" required />
 
         <button type="submit">Se connecter</button>
@@ -35,6 +33,7 @@ export default {
   },
   methods: {
     login() {
+      // Temporary hardcoded user list
       const users = [
         { email: "admin@example.com", password: "nouveauMotDePasse", role: 1 },
         { email: "agent@example.com", password: "agent123", role: 2 },
@@ -45,13 +44,15 @@ export default {
       );
 
       if (user) {
+        localStorage.setItem("authToken", "mock-token");
         localStorage.setItem("role", user.role);
         alert("Connexion réussie !");
-        console.log("Redirection vers :", user.role === 1 ? "/admin-dashboard" : "/agent-dashboard");
-        // Redirection en fonction du rôle
+
         if (user.role === 1) {
+          console.log("Redirection vers : /admin-dashboard");
           this.$router.push("/admin-dashboard");
         } else if (user.role === 2) {
+          console.log("Redirection vers : /agent-dashboard");
           this.$router.push("/agent-dashboard");
         }
       } else {
@@ -61,8 +62,8 @@ export default {
   },
 };
 </script>
+
 <style scoped>
-/* General layout */
 .login-container {
   display: flex;
   height: 100vh;
