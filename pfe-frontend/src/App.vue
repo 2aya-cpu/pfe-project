@@ -1,16 +1,36 @@
 <template>
-  <div id="app">
-    <UserManagement />
+
+
+  <div>
+    <!-- Afficher la Navbar sauf sur la page de login -->
+    <Navbar v-if="showNavbar" />
+    
+    <div class="pt-16">
+      <router-view />
+    </div>
+
   </div>
 </template>
 
 <script>
-import UserManagement from "@/components/UserManagement.vue"; // Correct the path if necessary
+
+
+import Navbar from "@/components/NavBar.vue";
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 
 export default {
-  name: "App",
   components: {
-    UserManagement,
+    Navbar,
+  },
+  setup() {
+    const route = useRoute();
+
+    // Vérifier si la route actuelle est la page de login
+    const showNavbar = computed(() => route.meta.showNavbar !== false);
+
+    return { showNavbar };
+
   },
 };
 </script>

@@ -22,10 +22,6 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.12.0"
   },
-  
-    "email": "admin@example.com",
-    "password": "monmotdepasse"
+  "email": "admin@example.com",
+  "password": "monmotdepasse"
 }
-
-
-

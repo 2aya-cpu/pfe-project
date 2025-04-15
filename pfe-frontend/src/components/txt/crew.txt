@@ -1,0 +1,140 @@
+<template>
+  <div class="container">
+    <div class="form-container">
+      <h1>Sélection de l'Équipage</h1>
+      
+      <!-- ✅ Affichage des données du vol avec une vérification -->
+      <p v-if="flightData.numVoyage">
+        Vol: {{ flightData.numVoyage }} | Étape: {{ flightData.etape }} | Date: {{ flightData.dateDepart }}
+      </p>
+      <p v-else class="error">❌ Aucune donnée de vol reçue !</p>
+
+      <form @submit.prevent="submitCrew">
+        <div class="form-grid">
+          <div v-for="(pn, index) in crewSelection" :key="index" class="form-group">
+            <label>Personnel Navigant {{ index + 1 }}</label>
+            <select v-model="pn.pnId">
+              <option value="">Sélectionner un PN</option>
+              <option v-for="member in personnel" :key="member.matricule_pn" :value="member.matricule_pn">
+                {{ member.nom }} {{ member.prenom }} ({{ member.matricule_pn }})
+              </option>
+            </select>
+
+            <label>Position</label>
+            <select v-model="pn.position">
+              <option value="Pilote">Pilote</option>
+              <option value="Copilote">Copilote</option>
+              <option value="Mise en place">Mise en place </option>
+              <option value="PNC">PNC</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn save">💾 Enregistrer</button>
+      </form>
+    </div>
+  </div>
+</template>
+
+<script>
+
+export default {
+  props: {
+    numVol: Number, // Récupère l'ID du vol depuis VolReel.vue
+  },
+  data() {
+    return {
+      flightData: {
+        numVoyage: "Inconnu",
+        etape: "Inconnu",
+        dateDepart: "Inconnu",
+      }, 
+      personnel: [], 
+      crewSelection: [
+        { pnId: "", position: "" },
+        { pnId: "", position: "" },
+        { pnId: "", position: "" },
+        { pnId: "", position: "" },
+      ],
+    };
+  },
+  mounted() {
+    console.log("📡 Données de vol reçues :", this.$route.params);
+
+    // ✅ Vérification des paramètres reçus et mise à jour de flightData
+    if (this.$route.params.numVoyage) {
+      this.flightData = {
+        numVoyage: this.$route.params.numVoyage,
+        etape: this.$route.params.etape,
+        dateDepart: this.$route.params.dateDepart,
+      };
+    } else {
+      console.warn("⚠️ Aucune donnée de vol reçue !");
+    }
+
+    this.fetchPersonnel();
+  },
+  methods: {
+    async fetchPersonnel() {
+      try {
+        
+        console.log("📡 Récupération du personnel...");
+        const response = await fetch("http://localhost:5000/api/personnels");
+        const data = await response.json();
+        console.log("✅ Données reçues :", data);
+        
+        this.personnel = data.map(member => ({
+          matricule_pn: member.matricule_pn,
+          nom: member.nom,
+          prenom: member.prenom,
+          code_grade: member.code_grade,
+          groupe_sociopro: member.groupe_sociopro
+        }));
+      } catch (error) {
+        console.error("❌ Erreur chargement PN :", error);
+      }
+    },
+    async submitCrew() {
+  try {
+    const crewData = this.crewSelection
+      .filter(pn => pn.pnId && pn.position)
+      .map(pn => ({
+        id: this.numVol, // ✅ Utilise bien l'ID récupéré de VolReel.vue
+        matricule_pn: pn.pnId,
+        code_position: pn.position
+      }));
+
+    if (crewData.length === 0) {
+      alert("❌ Aucun équipage sélectionné !");
+      return;
+    }
+
+    console.log("📤 Données équipage envoyées:", JSON.stringify(crewData, null, 2));
+
+    const response = await fetch("http://localhost:5000/api/participations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(crewData),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      alert("✅ Équipage enregistré avec succès !");
+    } else {
+      alert("❌ Erreur: " + data.error);
+    }
+  } catch (error) {
+    console.error("❌ Erreur enregistrement équipage:", error);
+  }
+}
+,
+  },
+};
+</script>
+
+<style>
+.error {
+  color: red;
+  font-weight: bold;
+}
+</style>
