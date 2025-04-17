@@ -22,6 +22,16 @@ const limiter = rateLimit({
   max: 100, // 100 requêtes max
 });
 app.use(limiter);
+const escalesRoutes = require('./routes/escale');
+app.use('/api/escales', escalesRoutes);
+const typesimulationRoutes = require('./routes/typesimulation');
+app.use('/api/typesimulations', typesimulationRoutes);
+const simulateurRoutes = require('./routes/simulateur');
+app.use('/api/simulateurs', simulateurRoutes);
+const naturevolRoutes = require('./routes/naturevol');
+app.use('/api/natures_vols', naturevolRoutes);
+const tronconRoutes = require('./routes/troncon');
+app.use('/api/troncons', tronconRoutes);
 
 // ✅ Importation des routes
 const authRoutes = require("./routes/authRoutes");
@@ -37,6 +47,13 @@ const pr = require("./routes/pr");
 const bases = require("./routes/bases");
 const positionsRouter = require('./routes/positions');  
 const userRoutes = require("./routes/users"); // Corrected path to match the file name
+const typeavion = require("./routes/typeavion"); // Corrected path to match the file name
+const gradesRoutes = require('./routes/grades');
+const reseauxRoutes = require('./routes/reseaux'); // ← ajouter cette ligne
+
+const contratsRoutes = require('./routes/contrats');
+
+
 // ✅ Utilisation des routes
 app.use("/api/auth", authRoutes);
 app.use("/api/pn", pnRoutes);
@@ -51,6 +68,12 @@ app.use("/api/participationsim", participationsimRoutes);
 app.use("/api/tablesimulation", tablesimulationsRoutes);
 app.use("/api/pr", pr);
 app.use("/api/users", userRoutes); // User management routes
+app.use('/api/typeavions',typeavion);
+app.use('/api/grades', gradesRoutes);
+app.use('/api/contrats', contratsRoutes);
+const rolesRoutes = require('./routes/roles');
+app.use('/api/reseaux', reseauxRoutes); // ← connecter la route
+app.use('/api/roles', rolesRoutes);
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {

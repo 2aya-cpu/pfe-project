@@ -141,19 +141,24 @@ export default {
         this.menus = [
           { title: "user management", link: "/users", submenus: [] },
           {
-            title: "Gestion utilisateurs",
+            title: "Table de referance",
             submenus: [
-              { title: "Ajouter un utilisateur", link: "/admin-add-user" },
-              { title: "Liste des utilisateurs", link: "/admin-users" },
+              { title: "nature de vol", link: "/naturevol" }, 
+              { title: "Type avion  ", link: "/typeavion" }, 
+              { title: "grades", link: "/grade" }, 
+              { title: " contrats", link: "/contrats" }, 
+              { title: "role ", link: "/role" }, 
+              { title: "Reseaux   ", link: "reseau" }, 
+              { title: "escale  ", link: "escale" }, 
+              { title: "type simulation  ", link: "typesimulation" }, 
+              { title: "simulateur  ", link: "simulateur" }, 
+              { title: "troncons ", link: "troncon" }, 
+              { title: "bases", link: "/bases" }, 
+              { title: "position", link: "/position" },  
+
             ],
           },
-          {
-            title: "Statistiques",
-            submenus: [
-              { title: "Par utilisateur", link: "/stats/users" },
-              { title: "Par vols", link: "/stats/vols" },
-            ],
-          },
+        
         ];
       } else if (role === 2) {
         // 🔑 Menu agent
