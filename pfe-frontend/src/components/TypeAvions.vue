@@ -1,11 +1,6 @@
 <template>
     <div class="type-avions">
-      <!-- Header -->
-      <header class="header">
-        <img class="logo" src="@/assets/airalgerie.jpg" alt="Logo" />
-        <h1 class="title">Reference T</h1>
-        <img class="account-icon" src="@/assets/icons/icons8-account-24.png" alt="Account Icon" />
-      </header>
+  
   
       <!-- Page Title -->
       <div class="sub-header">
@@ -13,7 +8,7 @@
       </div>
   
       <!-- Table -->
-      <div class="table-container">
+      <div class="table-containery">
         <table>
           <thead>
             <tr>
@@ -45,7 +40,7 @@
     methods: {
       fetchTypeAvions() {
         axios
-          .get('http://localhost:8080/api/typeavions')
+          .get('/api/typeavions')
           .then((response) => {
             this.typeAvions = response.data;
           })
@@ -97,7 +92,7 @@
   }
   
   /* Table */
-  .table-container {
+  .table-containeyr {
     margin-top: 30px;
     overflow-x: auto;
   }

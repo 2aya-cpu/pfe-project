@@ -51,6 +51,7 @@ export default {
         if (user.role === 1) {
           console.log("Redirection vers : /admin-dashboard");
           this.$router.push("/admin-dashboard");
+          console.log("Routing to admin");
         } else if (user.role === 2) {
           console.log("Redirection vers : /agent-dashboard");
           this.$router.push("/agent-dashboard");

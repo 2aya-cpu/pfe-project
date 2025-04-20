@@ -8,12 +8,15 @@ const rateLimit = require("express-rate-limit");
 // Charge les variables d'environnement
 dotenv.config();
 
-// Crée une instance de l'application Express
-const app = express();
+const app = express(); // Initialize app first
+app.set('trust proxy', 1); // Trust the first proxy
+
 const PORT = process.env.PORT || 5000;
 
 // Middleware de sécurité
-app.use(cors());
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://172.20.10.2:8080']
+}));
 app.use(helmet());
 app.use(express.json());
 
@@ -24,20 +27,42 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Importation des routes
-const authRoutes = require("./routes/authRoutes"); // Routes d'authentification
-const pnRoutes = require("./routes/pnRoutes"); // Routes pour gérer les PN
-const userRoutes = require("./routes/users"); // Corrected path to match the file name
+// ✅ Importation des routes
+const authRoutes = require("./routes/authRoutes");
+const pnRoutes = require("./routes/pnRoutes"); 
+const referencesRoutes = require("./routes/references");
+const acnatureRoutes = require("./routes/acnature");
+const volsRoutes = require("./routes/vols");
+const equipageRoutes = require("./routes/equipage");
+const simulationsRoutes = require("./routes/simulations");
+const participationsimRoutes = require("./routes/participationsim");
+const tablesimulationsRoutes = require("./routes/tablesimulation");
+const pr = require("./routes/pr");
+const bases = require("./routes/bases");
+const positionsRouter = require('./routes/positions');
+const userRoutes = require("./routes/users"); // ✅ On garde cette ligne ici seulement
+const typeAvionsRoutes = require("./routes/typeavions");
 
-// Utilisation des routes
-app.use("/api/auth", authRoutes); // Auth routes
-app.use("/api/pn", pnRoutes); // PN routes
-app.use("/api/users", userRoutes); // User management routes
+// ✅ Utilisation des routes
+app.use("/api/auth", authRoutes);
+app.use("/api/pn", pnRoutes);
+app.use("/api/bases", bases);
+app.use('/api/positions', positionsRouter); 
+app.use("/api", referencesRoutes);
+app.use("/api/acnature", acnatureRoutes);
+app.use("/api/vols", volsRoutes);
+app.use("/api/equipage", equipageRoutes);
+app.use("/api/simulations", simulationsRoutes);
+app.use("/api/participationsim", participationsimRoutes);
+app.use("/api/tablesimulation", tablesimulationsRoutes);
+app.use("/api/pr", pr);
+app.use("/api/users", userRoutes); // ✅ Route pour user management
+app.use("/api/typeavions", typeAvionsRoutes);
 
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Une erreur est survenue" });
+  console.error("❌ Erreur détectée :", err.message);
+  res.status(500).json({ error: err.message });
 });
 
 // Démarrer le serveur

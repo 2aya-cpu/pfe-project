@@ -1,170 +1,180 @@
 <template>
-  <div class="container">
-    <h2>{{ isEditing ? "Modifier un utilisateur" : "Ajouter un utilisateur" }}</h2>
+  <div class="type-avions">
+    <!-- Header -->
+    <header class="header">
+      <img class="logo" src="@/assets/airalgerie.jpg" alt="Logo" />
+      <h1 class="header-title">Références</h1>
+      <img class="account-icon" src="@/assets/icons/icons8-account-24.png" alt="Account Icon" />
+    </header>
 
-    <div class="form">
-      <input v-model="newUser.name" placeholder="Nom" />
-      <input v-model="newUser.email" placeholder="Email" />
-      <input v-model="newUser.etat" placeholder="État" />
-      <input v-model="newUser.password" placeholder="Mot de passe" type="password" />
-      <input v-model="newUser.id_role" placeholder="ID du rôle" type="number" />
-
-      <div class="form-buttons">
-        <button v-if="isEditing" @click="updateUser">💾 Mettre à jour</button>
-        <button v-else @click="addUser">➕ Ajouter</button>
-      </div>
+    <!-- Page Title -->
+    <div class="page-title">
+      <h2>Types d'Avions</h2>
     </div>
 
-    <h2>Liste des utilisateurs</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nom</th>
-          <th>Email</th>
-          <th>État</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.etat }}</td>
-          <td>
-            <button class="edit" @click="editUser(user)">📝</button>
-            <button class="delete" @click="deleteUser(user.id)">🗑</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Optional Search Bar -->
+    <div class="search-bar">
+      <img src="@/assets/icons/search-icon.png" class="search-icon" alt="Search Icon" />
+      <input type="text" v-model="searchQuery" placeholder="Rechercher un type d'avion..." />
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table class="styled-table">
+        <thead>
+          <tr>
+            <th>Code Type</th>
+            <th>Libellé Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="type in filteredAvions" :key="type.code_typeavion">
+            <td>{{ type.code_typeavion }}</td>
+            <td>{{ type.lib_typeavion }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
+<script>
+import axios from 'axios';
 
-<script setup>
-import { ref, onMounted } from "vue";
-import axios from "axios";
-
-const users = ref([]);
-const newUser = ref({ id: null, name: "", email: "", etat: "", password: "", id_role: null });
-const isEditing = ref(false);
-
-const fetchUsers = async () => {
-  try {
-    const { data } = await axios.get("http://localhost:8080/api/users");
-    users.value = data;
-  } catch (error) {
-    console.error("Erreur lors du chargement des utilisateurs", error);
-  }
+export default {
+  name: 'TypeAvions',
+  data() {
+    return {
+      typeAvions: [],
+      searchQuery: '',
+    };
+  },
+  computed: {
+    filteredAvions() {
+      return this.typeAvions.filter((avion) =>
+        avion.lib_typeavion.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
+  },
+  methods: {
+    fetchTypeAvions() {
+      axios
+        .get('http://localhost:8080/api/typeavions')
+        .then((response) => {
+          this.typeAvions = response.data;
+        })
+        .catch((error) => {
+          console.error('Error fetching type avions:', error);
+        });
+    },
+  },
+  mounted() {
+    this.fetchTypeAvions();
+  },
 };
-
-const addUser = async () => {
-  try {
-    await axios.post("http://localhost:8080/api/users", newUser.value);
-    resetForm();
-    fetchUsers();
-  } catch (error) {
-    console.error("Erreur lors de l'ajout de l'utilisateur", error);
-  }
-};
-
-const editUser = (user) => {
-  newUser.value = { ...user };
-  isEditing.value = true;
-};
-
-const updateUser = async () => {
-  try {
-    await axios.put(`http://localhost:8080/api/users/${newUser.value.id}`, newUser.value);
-    resetForm();
-    fetchUsers();
-  } catch (error) {
-    console.error("Erreur lors de la mise à jour de l'utilisateur", error);
-  }
-};
-
-const deleteUser = async (id) => {
-  if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
-    try {
-      await axios.delete(`http://localhost:8080/api/users/${id}`);
-      fetchUsers();
-    } catch (error) {
-      console.error("Erreur lors de la suppression", error);
-    }
-  }
-};
-
-const resetForm = () => {
-  newUser.value = { id: null, name: "", email: "", etat: "", password: "", id_role: null };
-  isEditing.value = false;
-};
-
-onMounted(fetchUsers);
 </script>
-
 <style scoped>
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
+.type-avions {
+  font-family: 'Segoe UI', sans-serif;
+  padding-bottom: 60px;
+  background-color: #f9f9f9;
 }
 
-h2 {
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.form {
+/* Header */
+.header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  padding: 20px 40px;
+  background-color: #fff;
+  border-bottom: 2px solid #dd1620;
 }
 
-input {
-  flex: 1 1 30%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+.logo {
+  width: 120px;
+  height: auto;
 }
 
-.form-buttons {
-  width: 100%;
-  margin-top: 10px;
+.header-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: 700;
+  color: #222;
 }
 
-button {
-  padding: 8px 12px;
-  margin-right: 8px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
+.account-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
 }
 
-.edit {
-  background-color: #ffc107;
-}
-
-.delete {
-  background-color: #dc3545;
-  color: white;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-th, td {
-  padding: 12px;
-  border: 1px solid #ddd;
+/* Page Title */
+.page-title {
+  margin: 40px 0 20px;
   text-align: center;
 }
+.page-title h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #dd1620;
+}
 
-th {
-  background-color: #f8f8f8;
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+.search-bar input {
+  width: 350px;
+  padding: 10px 40px 10px 40px;
+  font-size: 15px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+.search-icon {
+  position: absolute;
+  margin-left: -310px;
+  width: 20px;
+  height: 20px;
+}
+
+/* Table */
+.table-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+.styled-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 14px;
+}
+.styled-table thead th {
+  background-color: #b30000;
+  color: white;
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 15px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.styled-table tbody tr {
+  background-color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+.styled-table tbody td {
+  padding: 14px 18px;
+  font-size: 15px;
+  color: #333;
+}
+.styled-table tbody tr:hover {
+  background-color: #f4f4f4;
 }
 </style>
