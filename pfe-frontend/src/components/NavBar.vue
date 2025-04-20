@@ -120,18 +120,10 @@ export default {
         this.menus = [
           { title: "User Management", link: "/users", submenus: [] },
           {
-            title: "Gestion utilisateurs",
+            title: "Table de referance",
             submenus: [
               { title: "Ajouter un utilisateur", link: "/admin-add-user" },
               { title: "Liste des utilisateurs", link: "/admin-users" },
-            ],
-          },
-          {
-            title: "Configuration",
-            submenus: [
-              { title: "Bases", link: "/bases" },
-              { title: "Position", link: "/position" },
-              { title: "Types d'avion", link: "/typeavions" },
             ],
           },
           {
@@ -141,6 +133,7 @@ export default {
               { title: "Par vols", link: "/stats/vols" },
             ],
           },
+        
         ];
       } else if (role === 2) {
         // 🔑 Agent menu
