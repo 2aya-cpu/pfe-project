@@ -32,49 +32,66 @@
       </ul>
     </nav>
 
-    <!-- Sous-menu de déconnexion -->
-    <div
-      class="submenu-container"
-      v-if="showLogoutMenu"
-      @mouseover="clearCloseTimeout"
-      @mouseleave="startCloseTimeout"
-    >
+    <!-- Déconnexion -->
+    <div class="submenu-container" v-if="showLogoutMenu" @mouseover="clearCloseTimeout" @mouseleave="startCloseTimeout">
       <ul class="submenu">
         <li @click="logout">Déconnexion</li>
       </ul>
     </div>
 
-    <!-- Sous-menu affiché sous la barre -->
+    <!-- Sous-menu standard -->
     <div
       class="submenu-container"
-      v-if="activeMenu !== null && menus[activeMenu].submenus.length > 0"
+      v-if="activeMenu !== null && menus[activeMenu].submenus.length > 0 && menus[activeMenu].title !== 'Table de referance'"
       @mouseover="clearCloseTimeout"
       @mouseleave="startCloseTimeout"
     >
       <ul class="submenu">
         <li v-for="(submenu, subIndex) in menus[activeMenu].submenus" :key="subIndex">
-          <router-link :to="submenu.link">
-            {{ submenu.title }}
-            <div class="underline" v-if="hoveredSubIndex === subIndex"></div>
-          </router-link>
+          <router-link :to="submenu.link">{{ submenu.title }}</router-link>
         </li>
       </ul>
     </div>
+
+    <!-- Mega Menu for "Table de referance" -->
+    <div
+      class="mega-menu"
+      v-if="activeMenu !== null && menus[activeMenu].title === 'Table de referance'"
+      @mouseover="clearCloseTimeout"
+      @mouseleave="startCloseTimeout"
+    >
+      <div class="mega-column" v-for="(chunk, i) in chunkedSubmenus" :key="i">
+        <ul>
+          <li v-for="(item, index) in chunk" :key="index">
+            <router-link :to="item.link">{{ item.title }}</router-link>
+          </li>
+        </ul>
+      </div>
+    </div>
   </header>
 </template>
-
 <script>
 export default {
   data() {
     return {
       activeMenu: null,
       hoveredMenu: null,
-      hoveredSubIndex: null,
       closeTimeout: null,
       menus: [],
       userEmail: "",
       showLogoutMenu: false,
     };
+  },
+  computed: {
+    chunkedSubmenus() {
+      const submenus = this.menus[this.activeMenu]?.submenus || [];
+      const chunkSize = 4;
+      const chunks = [];
+      for (let i = 0; i < submenus.length; i += chunkSize) {
+        chunks.push(submenus.slice(i, i + chunkSize));
+      }
+      return chunks;
+    },
   },
   mounted() {
     const role = parseInt(localStorage.getItem("role"));
@@ -84,9 +101,7 @@ export default {
   methods: {
     async fetchUserEmail(role) {
       try {
-        let email = "";
-        if (role === 1) email = "admin@example.com";
-        else if (role === 2) email = "agent@example.com";
+        let email = role === 1 ? "admin@example.com" : "agent@example.com";
         this.userEmail = email;
       } catch (error) {
         console.error("Erreur lors de la récupération de l'email :", error);
@@ -116,27 +131,27 @@ export default {
     },
     setMenuByRole(role) {
       if (role === 1) {
-        // 🔑 Admin menu
         this.menus = [
-          { title: "User Management", link: "/users", submenus: [] },
+          { title: "user management", link: "/users", submenus: [] },
           {
             title: "Table de referance",
             submenus: [
-              { title: "Ajouter un utilisateur", link: "/admin-add-user" },
-              { title: "Liste des utilisateurs", link: "/admin-users" },
+              { title: "nature de vol", link: "/naturevol" },
+              { title: "Type avion", link: "/typeavion" },
+              { title: "grades", link: "/grade" },
+              { title: "contrats", link: "/contrats" },
+              { title: "role", link: "/role" },
+              { title: "Reseaux", link: "/reseau" },
+              { title: "escale", link: "/escale" },
+              { title: "type simulation", link: "/typesimulation" },
+              { title: "simulateur", link: "/simulateur" },
+              { title: "troncons", link: "/troncon" },
+              { title: "bases", link: "/bases" },
+              { title: "position", link: "/position" },
             ],
           },
-          {
-            title: "Statistiques",
-            submenus: [
-              { title: "Par utilisateur", link: "/stats/users" },
-              { title: "Par vols", link: "/stats/vols" },
-            ],
-          },
-        
         ];
       } else if (role === 2) {
-        // 🔑 Agent menu
         this.menus = [
           { title: "G personnel navigant", link: "/pn-manager", submenus: [] },
           {
@@ -161,8 +176,8 @@ export default {
               { title: "Avion", link: "/actavion" },
               { title: "PNC par secteur", link: "/actpnc" },
               { title: "PNT par secteur", link: "/actpnt" },
-              { title: "simulation PNt par secteur ", link: "/actsim" },
-              { title: "PN ", link: "/actpn" },
+              { title: "simulation PNt par secteur", link: "/actsim" },
+              { title: "PN", link: "/actpn" },
             ],
           },
         ];
@@ -173,9 +188,8 @@ export default {
   },
 };
 </script>
-
 <style scoped>
-/* Styling kept as is (unchanged) */
+/* Navbar and layout */
 header {
   background: #fff;
   padding: 5px 20px;
@@ -200,27 +214,33 @@ header {
   align-items: center;
   list-style: none;
   padding: 0;
-  position: relative;
+  margin: 0;
+  gap: 30px; /* Ensure consistent spacing between menu items */
 }
 
 .menu-item {
-  position: relative;
-  margin: 0 15px;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .menu-item button,
 .menu-link {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 15px;
   background: none;
   border: none;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  padding: 8px 15px;
-  transition: color 0.3s ease-in-out;
-  text-decoration: none;
   color: #333;
+  text-decoration: none;
   position: relative;
+  transition: color 0.3s ease-in-out;
 }
+
 
 .menu-item button:hover,
 .menu-link:hover {
@@ -246,6 +266,25 @@ header {
   }
 }
 
+.arrow {
+  font-size: 12px;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.rotated {
+  transform: rotate(180deg);
+}
+
+/* Ensure the user-email is correctly aligned */
+.user-email {
+  font-weight: bold;
+  margin-left: 20px;
+  color: #555;
+  display: flex;
+  align-items: center; /* Ensure it aligns with other items */
+}
+
 .submenu-container {
   position: absolute;
   top: 100%;
@@ -259,33 +298,18 @@ header {
   animation: fadeIn 0.3s ease-in-out;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 .submenu {
   display: flex;
   list-style: none;
   gap: 30px;
 }
 
-.submenu li {
-  position: relative;
-}
-
 .submenu li a {
   display: block;
   padding: 8px 15px;
   color: black;
-  text-decoration: none;
   font-weight: bold;
+  text-decoration: none;
   transition: color 0.3s ease-in-out;
 }
 
@@ -293,26 +317,47 @@ header {
   color: red;
 }
 
-.submenu li a .underline {
-  bottom: -2px;
+/* ✅ Mega Menu */
+.mega-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background: white;
+  padding: 30px;
+  border-top: 2px solid red;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-.arrow {
-  font-size: 12px;
-  margin-left: 5px;
-  transition: transform 0.3s ease;
+.mega-column {
+  flex: 1;
+  max-width: 200px;
 }
 
-.rotated {
-  transform: rotate(180deg);
+.mega-column ul {
+  list-style: none;
+  padding: 0;
 }
 
-.user-email {
+.mega-column li {
+  margin-bottom: 10px;
+}
+
+.mega-column a {
+  color: black;
   font-weight: bold;
-  margin-left: 20px;
-  color: #555;
+  text-decoration: none;
+  transition: color 0.3s;
 }
 
+.mega-column a:hover {
+  color: red;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .navbar {
     flex-direction: column;
@@ -323,11 +368,12 @@ header {
     gap: 10px;
   }
 
-  .submenu-container {
+  .submenu-container,
+  .mega-menu {
     position: relative;
     top: 0;
     left: 0;
-    width: 100%;
+    flex-direction: column;
   }
 }
 </style>

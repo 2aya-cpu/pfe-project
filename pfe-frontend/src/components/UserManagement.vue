@@ -1,180 +1,286 @@
 <template>
-  <div class="type-avions">
-    <!-- Header -->
-    <header class="header">
-      <img class="logo" src="@/assets/airalgerie.jpg" alt="Logo" />
-      <h1 class="header-title">Références</h1>
-      <img class="account-icon" src="@/assets/icons/icons8-account-24.png" alt="Account Icon" />
-    </header>
-
-    <!-- Page Title -->
-    <div class="page-title">
-      <h2>Types d'Avions</h2>
+  <div class="user-management">
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Gestion des Utilisateurs</h1>
     </div>
 
-    <!-- Optional Search Bar -->
-    <div class="search-bar">
-      <img src="@/assets/icons/search-icon.png" class="search-icon" alt="Search Icon" />
-      <input type="text" v-model="searchQuery" placeholder="Rechercher un type d'avion..." />
+    <!-- Search & Add User -->
+    <div class="top-controls">
+      <div class="search-bar">
+        <img :src="searchIcon" alt="search-icon" class="icon" />
+        <input v-model="searchQuery" placeholder="Rechercher un utilisateur..." />
+      </div>
+      <button class="add-user-btn-clean" @click="toggleForm">
+  + Ajouter Utilisateur
+</button>
+
     </div>
 
-    <!-- Table -->
-    <div class="table-wrapper">
-      <table class="styled-table">
-        <thead>
-          <tr>
-            <th>Code Type</th>
-            <th>Libellé Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="type in filteredAvions" :key="type.code_typeavion">
-            <td>{{ type.code_typeavion }}</td>
-            <td>{{ type.lib_typeavion }}</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- User Form -->
+    <div v-if="showForm" class="user-form">
+      <h2>{{ isEditing ? "Modifier un utilisateur" : "Ajouter un utilisateur" }}</h2>
+      <input v-model="newUser.name" placeholder="Nom" />
+      <input v-model="newUser.email" placeholder="Email" />
+      <input v-model="newUser.etat" placeholder="État" />
+      <input v-model="newUser.password" placeholder="Mot de passe" type="password" />
+      <input v-model="newUser.id_role" placeholder="ID du rôle" type="number" />
+
+      <div class="form-buttons">
+        <button v-if="isEditing" @click="updateUser">💾 Mettre à jour</button>
+        <button v-else @click="addUser">+Ajouter</button>
+      </div>
     </div>
+
+    <!-- User Table -->
+    <h2>Liste des utilisateurs</h2>
+    <table class="user-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>État</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="user in filteredUsers" :key="user.id">
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span :class="['etat', user.etat === 'activé' ? 'active' : 'inactive']">
+              {{ user.etat }}
+            </span>
+          </td>
+          <td>
+            <img class="icon-btn" :src="modifyIcon" alt="modifier" @click="editUser(user)" />
+            <img class="icon-btn" :src="deleteIcon" alt="supprimer" @click="deleteUser(user.id)" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
-<script>
-import axios from 'axios';
 
-export default {
-  name: 'TypeAvions',
-  data() {
-    return {
-      typeAvions: [],
-      searchQuery: '',
-    };
-  },
-  computed: {
-    filteredAvions() {
-      return this.typeAvions.filter((avion) =>
-        avion.lib_typeavion.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-  },
-  methods: {
-    fetchTypeAvions() {
-      axios
-        .get('http://localhost:8080/api/typeavions')
-        .then((response) => {
-          this.typeAvions = response.data;
-        })
-        .catch((error) => {
-          console.error('Error fetching type avions:', error);
-        });
-    },
-  },
-  mounted() {
-    this.fetchTypeAvions();
-  },
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import axios from "axios";
+
+import deleteIcon from '../assets/icons/icons8-delete-30.png';
+import modifyIcon from '../assets/icons/icons8-modify-50.png';
+import searchIcon from '../assets/icons/icons8-search-50.png';
+
+const users = ref([]);
+const newUser = ref({ id: null, name: "", email: "", etat: "", password: "", id_role: null });
+const isEditing = ref(false);
+const showForm = ref(false);
+const searchQuery = ref("");
+
+const fetchUsers = async () => {
+  try {
+    const { data } = await axios.get("http://localhost:5000/api/users");
+    users.value = data;
+  } catch (error) {
+    console.error("Erreur lors du chargement des utilisateurs", error);
+  }
 };
+
+const addUser = async () => {
+  try {
+    await axios.post("http://localhost:5000/api/users", newUser.value);
+    resetForm();
+    fetchUsers();
+  } catch (error) {
+    console.error("Erreur lors de l'ajout de l'utilisateur", error);
+  }
+};
+
+const editUser = (user) => {
+  newUser.value = { ...user };
+  isEditing.value = true;
+  showForm.value = true;
+};
+
+const updateUser = async () => {
+  try {
+    await axios.put(`http://localhost:5000/api/users/${newUser.value.id}`, newUser.value);
+    resetForm();
+    fetchUsers();
+  } catch (error) {
+    console.error("Erreur lors de la mise à jour de l'utilisateur", error);
+  }
+};
+
+const deleteUser = async (id) => {
+  if (confirm("Voulez-vous vraiment supprimer cet utilisateur ?")) {
+    try {
+      await axios.delete(`http://localhost:5000/api/users/${id}`);
+      fetchUsers();
+    } catch (error) {
+      console.error("Erreur lors de la suppression", error);
+    }
+  }
+};
+
+const resetForm = () => {
+  newUser.value = { id: null, name: "", email: "", etat: "", password: "", id_role: null };
+  isEditing.value = false;
+  showForm.value = false;
+};
+
+const toggleForm = () => {
+  showForm.value = !showForm.value;
+  if (!showForm.value) resetForm();
+};
+
+const filteredUsers = computed(() =>
+  users.value.filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+);
+
+onMounted(fetchUsers);
 </script>
 <style scoped>
-.type-avions {
-  font-family: 'Segoe UI', sans-serif;
-  padding-bottom: 60px;
-  background-color: #f9f9f9;
+.user-management {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* Header */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  padding: 20px 40px;
-  background-color: #fff;
-  border-bottom: 2px solid #dd1620;
-}
-
-.logo {
-  width: 120px;
-  height: auto;
-}
-
-.header-title {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 32px;
-  font-weight: 700;
-  color: #222;
-}
-
-.account-icon {
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-}
-
-/* Page Title */
-.page-title {
-  margin: 40px 0 20px;
+.page-header {
   text-align: center;
-}
-.page-title h2 {
-  font-size: 28px;
-  font-weight: 600;
-  color: #dd1620;
+  margin-bottom: 2rem;
 }
 
-/* Search Bar */
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .search-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 30px;
-}
-.search-bar input {
-  width: 350px;
-  padding: 10px 40px 10px 40px;
-  font-size: 15px;
-  border-radius: 25px;
-  border: 1px solid #ccc;
-  outline: none;
-}
-.search-icon {
-  position: absolute;
-  margin-left: -310px;
-  width: 20px;
-  height: 20px;
+  flex-grow: 1;
+  gap: 0.5rem;
 }
 
-/* Table */
-.table-wrapper {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 0 20px;
+.search-bar input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  min-width: 200px;
 }
-.styled-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 14px;
-}
-.styled-table thead th {
-  background-color: #b30000;
+
+/* Clean Modern Add User Button with subtle hover and press effects */
+.add-user-btn-clean {
+  background-color: #b22222;
   color: white;
-  padding: 14px 18px;
+  padding: 0.6rem 1.4rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.add-user-btn-clean:hover {
+  background-color: #a40000;
+  transform: translateY(-1px);
+}
+
+.add-user-btn-clean:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.user-form {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+  animation: slideDown 0.4s ease;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.user-form input {
+  display: block;
+  margin: 0.5rem 0;
+  padding: 0.4rem;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-table thead {
+  background-color: #b22222;
+  color: white;
+}
+
+.user-table th,
+.user-table td {
+  padding: 0.75rem;
   text-align: left;
-  font-size: 15px;
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
+  border-bottom: 1px solid #ddd;
+  transition: background-color 0.3s ease;
 }
-.styled-table tbody tr {
-  background-color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  border-radius: 10px;
-  transition: background 0.3s;
+
+.user-table tbody tr {
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
-.styled-table tbody td {
-  padding: 14px 18px;
-  font-size: 15px;
-  color: #333;
+
+.user-table tbody tr:hover {
+  background-color: #f2f2f2;
+  transform: translateX(2px);
 }
-.styled-table tbody tr:hover {
-  background-color: #f4f4f4;
+
+.icon-btn {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  transform: scale(1.1);
+}
+
+.etat.active {
+  color: green;
+  font-weight: bold;
+}
+
+.etat.inactive {
+  color: red;
+  font-weight: bold;
 }
 </style>

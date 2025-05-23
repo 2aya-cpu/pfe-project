@@ -8,7 +8,7 @@ const rateLimit = require("express-rate-limit");
 // Charge les variables d'environnement
 dotenv.config();
 
-const app = express(); // Initialize app first
+const app = express();
 app.set('trust proxy', 1); // Trust the first proxy
 
 const PORT = process.env.PORT || 5000;
@@ -22,19 +22,18 @@ app.use(express.json());
 
 // Middleware de limitation de débit
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // 100 requêtes max
+  windowMs: 15 * 60 * 1000,
+  max: 100,
 });
 app.use(limiter);
 
-// Routes spécifiques
+// ✅ Importation des routes
 const escalesRoutes = require('./routes/escale');
 const typesimulationRoutes = require('./routes/typesimulation');
 const simulateurRoutes = require('./routes/simulateur');
 const naturevolRoutes = require('./routes/naturevol');
 const tronconRoutes = require('./routes/troncon');
 
-// ✅ Importation des routes principales
 const authRoutes = require("./routes/authRoutes");
 const pnRoutes = require("./routes/pnRoutes"); 
 const referencesRoutes = require("./routes/references");
@@ -53,6 +52,8 @@ const gradesRoutes = require('./routes/grades');
 const reseauxRoutes = require('./routes/reseaux');
 const contratsRoutes = require('./routes/contrats');
 const rolesRoutes = require('./routes/roles');
+const dashboardRoutes = require('./routes/dashboard');
+const statsRoutes = require('./routes/statsRoutes');
 
 // ✅ Utilisation des routes
 app.use("/api/auth", authRoutes);
@@ -78,7 +79,9 @@ app.use('/api/typesimulations', typesimulationRoutes);
 app.use('/api/simulateurs', simulateurRoutes);
 app.use('/api/natures_vols', naturevolRoutes);
 app.use('/api/troncons', tronconRoutes);
-
+app.use('/api/dashboard-summary', dashboardRoutes); 
+app.use('/api', dashboardRoutes);
+app.use('/api/dashboard-summary', statsRoutes);
 // Middleware de gestion des erreurs
 app.use((err, req, res, next) => {
   console.error("❌ Erreur détectée :", err.message);

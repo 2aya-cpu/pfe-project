@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import LoginForm from "../components/LoginForm.vue";
-import TypeAvions from "../components/TypeAvions.vue";
+import TypeAvion from "../components/TypeAvion.vue";
 import AgentDashboard from "../components/AgentDashboard.vue";
 import PnManager from "@/components/PnManager.vue";
 import VolReel from "../components/VolReel.vue";
@@ -19,12 +19,9 @@ import ActSim from "../components/ActiSimulation.vue";
 import BaseS from "../components/BaseS.vue";
 import PositionS from "../components/PositionS.vue";
 import ModalP from "../components/ModalP.vue";
-import UserManagement from "../components/UserMangement.vue";
+import UserManagement from "../components/UserManagement.vue";
 import PaReel from "../components/PaReel.vue";
 import AdminDashboard from "../components/AdminDashboard.vue";
-
-// From other branch
-import typeavion from "../components/TYpeAvion.vue";
 import grades from "../components/GradesPage.vue";
 import contrat from "../components/ContratPage.vue";
 import role from "../components/RolePage.vue";
@@ -40,7 +37,7 @@ const routes = [
   { path: "/admin-dashboard", name: "AdminDashboard", component: AdminDashboard, meta: { requiresAuth: true } },
   { path: "/agent-dashboard", component: AgentDashboard, meta: { showNavbar: true } },
   { path: "/users", name: "UserManagement", component: UserManagement, meta: { requiresAuth: true, role: 1 } },
-  { path: "/typeavions", name: "TypeAvions", component: TypeAvions, meta: { requiresAuth: true, role: 1 } },
+  { path: "/TypeAvion", name: "TypeAvion", component: TypeAvion, meta: { requiresAuth: true, role: 1 } },
   { path: "/modal", component: ModalP },
   { path: "/bases", component: BaseS, meta: { showNavbar: true, role: 1 } },
   { path: "/position", component: PositionS, meta: { showNavbar: true, role: 1 } },
@@ -63,8 +60,7 @@ const routes = [
   { path: "/actnumvol", component: ActNumvol, meta: { showNavbar: true } },
   { path: "/actavion", component: ActAvion, meta: { showNavbar: true } },
 
-  // Additional admin config routes
-  { path: "/typeavion", component: typeavion, meta: { showNavbar: true } },
+  // Admin config routes
   { path: "/grade", component: grades, meta: { showNavbar: true } },
   { path: "/contrats", component: contrat, meta: { showNavbar: true } },
   { path: "/role", component: role, meta: { showNavbar: true } },

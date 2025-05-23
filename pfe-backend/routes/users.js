@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../config/db"); // Ensure db.js is using mysql2/promise
+const db = require("../config/db");
+const bcrypt = require("bcrypt");  // <--- Importer bcrypt
 
 // Récupérer tous les utilisateurs
 router.get("/", async (req, res) => {
   try {
-    // Fetching users using async/await with promise-based query
     const [users] = await db.query("SELECT * FROM users");
-    res.json(users);  // Return users as JSON
+    res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -15,13 +15,19 @@ router.get("/", async (req, res) => {
 
 // Ajouter un utilisateur
 router.post("/", async (req, res) => {
-  console.log("Données reçues :", req.body);  // Debugging line to check the received data
+  console.log("Données reçues :", req.body);
   const { name, email, etat, password, id_role } = req.body;
   try {
-    // Inserting user data using async/await with promise-based query
-    await db.query("INSERT INTO users (name, email, etat, password, id_role) VALUES (?, ?, ?, ?, ?)", 
-      [name, email, etat, password, id_role]);
-    res.json({ message: "Utilisateur ajouté !" });
+    // Hacher le mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10); // 10 = le "salt rounds"
+
+    // Insertion avec le mot de passe haché
+    await db.query(
+      "INSERT INTO users (name, email, etat, password, id_role) VALUES (?, ?, ?, ?, ?)",
+      [name, email, etat, hashedPassword, id_role]
+    );
+
+    res.json({ message: "Utilisateur ajouté avec mot de passe sécurisé !" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -31,10 +37,15 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const { name, email, etat, password, id_role } = req.body;
   try {
-    // Updating user data using async/await with promise-based query
-    await db.query("UPDATE users SET name=?, email=?, etat=?, password=?, id_role=? WHERE id=?", 
-      [name, email, etat, password, id_role, req.params.id]);
-    res.json({ message: "Utilisateur mis à jour !" });
+    // Hacher le nouveau mot de passe avant la mise à jour
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await db.query(
+      "UPDATE users SET name=?, email=?, etat=?, password=?, id_role=? WHERE id=?",
+      [name, email, etat, hashedPassword, id_role, req.params.id]
+    );
+
+    res.json({ message: "Utilisateur mis à jour avec mot de passe sécurisé !" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -43,7 +54,6 @@ router.put("/:id", async (req, res) => {
 // Supprimer un utilisateur
 router.delete("/:id", async (req, res) => {
   try {
-    // Deleting a user using async/await with promise-based query
     await db.query("DELETE FROM users WHERE id=?", [req.params.id]);
     res.json({ message: "Utilisateur supprimé !" });
   } catch (err) {
@@ -52,4 +62,3 @@ router.delete("/:id", async (req, res) => {
 });
 
 module.exports = router;
-

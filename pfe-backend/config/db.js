@@ -1,5 +1,5 @@
 // Importer le module mysql2/promise pour utiliser les promesses
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 
 // Charger les variables d'environnement depuis le fichier .env

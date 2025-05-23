@@ -368,7 +368,6 @@ export default {
 };
 </script>
 
-
 <style scoped>
 
 /* Animation pour l'apparition/disparition */
